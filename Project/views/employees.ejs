@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/styles_clients.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/styles_sideBar.css">
+    <link rel="stylesheet" href="/assets/css/styles_ejs.css">
+
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="area"></div>
+    <nav class="main-menu">
+        <ul>
+            <li>
+                <a href="/">
+                    <span class="nav-text">Dashboard</span>
+                </a>
+              
+            </li>
+            <li class="has-subnav">
+                <a href="/products">
+                    <span class="nav-text">Products</span>
+                </a>
+                
+            </li>
+            <li class="has-subnav">
+                <a href="/categories">
+                    <span class="nav-text">Categories</span>
+                </a>
+                
+            </li>
+            <li class="has-subnav">
+                <a href="/employees">
+                    <span class="nav-text">Employees</span>
+                </a>
+               
+            </li>
+            <li>
+                <a href="/clients">
+                    <span class="nav-text">Clients</span>
+                </a>
+            </li>
+            <li>
+
+
+
+        </ul>
+
+        <ul class="logout">
+            <li>
+               <a href="#">
+                     <i class="fa fa-power-off fa-2x"></i>
+                    <span class="nav-text">
+                        Logout
+                    </span>
+                </a>
+            </li>  
+        </ul>
+    </nav>
+
+
+    <h2>All Employees</h2>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search employees..." onkeyup="searchTable()">
+        <button class="search-button" onclick="searchTable()">Search</button>
+    </div>
+
+    <!-- Sort Dropdown -->
+    <div class="sort-container">
+        <label for="sortSelect">Sort By:</label>
+        <select id="sortSelect" onchange="sortTable()">
+            <option value="0">Employee ID</option>
+            <option value="1">Full Name</option>
+            <option value="2">Email</option>
+            <option value="3">Phone Number</option>
+            <option value="4">Position</option>
+            <option value="5">Date Of Hire</option>
+            <option value="6">Salary</option>
+            <option value="7">Bonus</option>
+            <option value="8">Work Hours</option>
+        </select>
+        <label for="sortOrder">Order:</label>
+        <select id="sortOrder" onchange="sortTable()">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+
+    <!-- Add Button -->
+    <button class="add-button" onclick="openAddModal()">Add Employee</button>
+    
+    <div class="table-wrapper">
+        <table class="fl-table">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Position</th>
+                    <th>Date Of Hire</th>
+                    <th>Salary</th>
+                    <th>Bonus</th>
+                    <th>Work Hours</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+                <% employees.forEach((employee, index) => { %>
+                    <tr data-id="<%= employee.EmployeeID %>">
+                        <td><%= employee.EmployeeID %></td>
+                        <td><%= employee.FullName %></td>
+                        <td><%= employee.Email %></td>
+                        <td><%= employee.Phone %></td>
+                        <td><%= employee.Position %></td>
+                        <td><%= employee.DateOfHire %></td>
+                        <td><%= employee.Salary %></td>
+                        <td><%= employee.Bonus %></td>
+                        <td><%= employee.WorkHours %></td>
+                        <td>
+                            <button class="edit-button" onclick="openEditModal('<%= employee.EmployeeID %>')">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="delete-button" onclick="openDeleteModal('<%= employee.EmployeeID %>', '<%= employee.FullName %>')">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add/Edit/Delete Modal Structure -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Add/Edit Employee</h3>
+            <form id="employeeForm" action="/editEmployee" method="post">
+                <input type="hidden" id="employeeId" name="EmployeeId">
+                
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="FullName" required><br>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="Email" required><br>
+                
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="number" id="phoneNumber" name="Phone" required><br>
+                
+                <label for="position">Position:</label>
+                <input type="text" id="position" name="Position" required><br>
+                
+                <label for="dateOfHire">Date Of Hire:</label>
+                <input type="date" id="dateOfHire" name="DateOfHire" required><br>
+                
+                <label for="salary">Salary:</label>
+                <input type="number" id="salary" name="Salary" required><br>
+                
+                <label for="bonus">Bonus:</label>
+                <input type="number" id="bonus" name="Bonus" required><br>
+                
+                <label for="workHours">Work Hours:</label>
+                <input type="text" id="workHours" name="WorkHours" required><br>
+                
+                <button type="submit" id="saveButton">Save</button>
+                <button type="button" id="deleteButton" onclick="openDeleteModal()">Delete</button>
+                <button type="button" onclick="closeModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <h3>Confirm Deletion</h3>
+            <p id="deleteConfirmationMessage"></p>
+            <button type="button" onclick="confirmDelete()">Yes, Delete</button>
+            <button type="button" onclick="closeDeleteModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let editingRowId = null;
+        let deletingRowId = null;
+
+        // Function to open the Add/Edit modal
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = 'Add New Employee';
+            document.getElementById('employeeForm').action = '/addEmployee';
+            document.getElementById('employeeForm').reset();
+            document.getElementById('deleteButton').style.display = 'none';
+            document.getElementById('employeeModal').style.display = 'block';
+        }
+
+        // Function to open the Edit modal
+        function openEditModal(employeeId) {
+            editingRowId = employeeId;
+            document.getElementById('modalTitle').innerText = 'Edit Employee';
+            document.getElementById('employeeForm').action = '/updateEmployee';
+            
+            // Populate the form with the current data
+            const row = document.querySelector(`tr[data-id="${employeeId}"]`);
+            const cells = row.getElementsByTagName('td');
+            
+            document.getElementById('employeeId').value = employeeId;
+            document.getElementById('fullName').value = cells[1].innerText;
+            document.getElementById('email').value = cells[2].innerText;
+            document.getElementById('phoneNumber').value = cells[3].innerText;
+            document.getElementById('position').value = cells[4].innerText;
+            document.getElementById('dateOfHire').value = cells[5].innerText;
+            document.getElementById('salary').value = cells[6].innerText;
+            document.getElementById('bonus').value = cells[7].innerText;
+            document.getElementById('workHours').value = cells[8].innerText;
+
+            document.getElementById('deleteButton').style.display = 'inline-block';
+            document.getElementById('employeeModal').style.display = 'block';
+        }
+
+        // Function to open the Delete modal
+        function openDeleteModal(employeeId, employeeName) {
+            deletingRowId = employeeId;
+            document.getElementById('deleteConfirmationMessage').innerText = `Are you sure you want to delete the employee with name: ${employeeName} and ID: ${employeeId}?`;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        // Function to confirm deletion
+        function confirmDelete() {
+            fetch('/deleteEmployee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ employeeId: deletingRowId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload(); // Reload the page after deletion
+                } else {
+                    alert('Error deleting employee');
+                }
+            });
+        }
+
+        // Function to close the modals
+        function closeModal() {
+            document.getElementById('employeeModal').style.display = 'none';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close the modal if the user clicks outside of it
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('employeeModal')) {
+                closeModal();
+            } else if (event.target == document.getElementById('deleteModal')) {
+                closeDeleteModal();
+            }
+        }
+    </script>
+</body>
+</html>
